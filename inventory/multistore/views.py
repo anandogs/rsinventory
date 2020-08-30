@@ -13,30 +13,10 @@ from . models import Stock, SKU, Location
 
 def index(request):
 
-    if request.method == 'POST':
-        form = TransactForm(request.POST)
-        if form.is_valid():
-            if 'returns' in request.POST:
-                obj = form.save(commit=False)
-                obj.quantity = -form.cleaned_data['quantity']
-                obj.save()
-            form.save()
-
-    if 'term' in request.GET:
-        inv = SKU.objects.filter(sku_code__istartswith=request.GET.get('term'))
-        
-        output = list()
-        for product in inv:
-            output.append(product.sku_code)
-        return JsonResponse(output, safe=False)
-    form = TransactForm()
-
-    return render(request, 'multistore/form.html', {'form': form})
-
-    # context = {
-    #     'stock_details' : Stock.objects.all()
-    # }
-    # return render(request, 'multistore/index.html', context)
+    context = {
+        'stock_details' : Stock.objects.all()
+    }
+    return render(request, 'multistore/index.html', context)
 
 def transact(request):
     if request.method == 'POST':
@@ -110,6 +90,6 @@ def login_view(request):
             # user = authenticate(username=username, password=password)
             # print(user)
             login(request, user)
-            return render(request, 'multistore/index.html')
+            return HttpResponseRedirect('/')
     form = AuthenticationForm()
     return render(request, 'multistore/login.html', {'form':form})
