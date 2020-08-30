@@ -1,11 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rangsutra Landing Page</title>
-</head>
-<body>
+{% extends 'multistore/base.html' %}
+
+{% block title %}
+Home
+{% endblock %}
+{% block body %}
     <div class="entry_options">
         <ul style="display: flex; width: 100%; justify-content: space-evenly; list-style: none;">
             <li> <a href="{% url 'sale' %}">Sale</a></li>
@@ -22,7 +20,8 @@
             </li>
             
             {% endfor %}
+
         </ul>
     </div>
-</body>
-</html>
+
+{% endblock %}

@@ -7,5 +7,7 @@ urlpatterns = [
     path('sale', views.sale, name='sale'),
     path('transfer', views.transfer, name='transfer'),
     path('returns', views.returns, name='returns'),
-    path('download', views.download, name='download')
+    path('transact', views.transact, name='transact'),
+    path('download', views.download, name='download'),
+    path('login', views.login_view, name='login')
 ]

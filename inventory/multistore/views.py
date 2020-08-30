@@ -1,12 +1,26 @@
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+
 from django.shortcuts import render
 from django.urls import reverse
+from .forms import TransactForm
 import pandas as pd
 import numpy as np
 
 from . models import Stock, SKU, Location
 
 def index(request):
+
+    if request.method == 'POST':
+        form = TransactForm(request.POST)
+        if form.is_valid():
+            if 'returns' in request.POST:
+                obj = form.save(commit=False)
+                obj.quantity = -form.cleaned_data['quantity']
+                obj.save()
+            form.save()
 
     if 'term' in request.GET:
         inv = SKU.objects.filter(sku_code__istartswith=request.GET.get('term'))
@@ -15,51 +29,53 @@ def index(request):
         for product in inv:
             output.append(product.sku_code)
         return JsonResponse(output, safe=False)
+    form = TransactForm()
+
+    return render(request, 'multistore/form.html', {'form': form})
+
+    # context = {
+    #     'stock_details' : Stock.objects.all()
+    # }
+    # return render(request, 'multistore/index.html', context)
+
+def transact(request):
+    if request.method == 'POST':
+        form = TransactForm(request.POST)
+    if form.is_valid():
+        if 'returns' in request.POST:
+            obj = form.save(commit=False)
+            obj.quantity = -form.cleaned_data['quantity']
+            obj.save()
+        form.save()
+        # return render(request, 'multistore/index.html')
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
-    context = {
-        'stock_details' : Stock.objects.all()
-    }
-    return render(request, 'multistore/index.html', context)
-
-
+@login_required(login_url='login')
 def sale(request):
-    
-    if request.method=='POST':
-        order_id = request.POST['order']
-        sku = request.POST['sku']
-        sku_returned = SKU.objects.get(sku_code = sku)
-        quantity = -int(request.POST['quantity'])
-        location = request.POST['location']
-        location_returned = Location.objects.get(location_name=location)
 
-        Stock.objects.create(order_no=order_id, sku=sku_returned, quantity=quantity, location=location_returned)
-        return HttpResponseRedirect(reverse('sale'))
-    
+
+    form = TransactForm()
     context = {
-        'locations' : Location.objects.all()
+        'form' : form,
+        'form_type' : 'sales'
     }
-    return render(request, 'multistore/sale.html', context)
+    
+    return render(request, 'multistore/form.html', context)
 
 def transfer(request):
     return HttpResponse('transfer page')
 
+@login_required(login_url='multistore/login/')
 def returns(request):
-    if request.method=='POST':
-        order_id = request.POST['order']
-        sku = request.POST['sku']
-        sku_returned = SKU.objects.get(sku_code = sku)
-        quantity = int(request.POST['quantity'])
-        location = request.POST['location']
-        location_returned = Location.objects.get(location_name=location)
 
-        Stock.objects.create(order_no=order_id, sku=sku_returned, quantity=quantity, location=location_returned)
-        return HttpResponseRedirect(reverse('returns'))
-    
+    form = TransactForm()
     context = {
-        'locations' : Location.objects.all()
+        'form' : form,
+        'form_type' : 'returns'
     }
-    return render(request, 'multistore/returns.html', context)
+    
+    return render(request, 'multistore/form.html', context)
 
 def download(request):
 
@@ -81,5 +97,19 @@ def download(request):
     
     grouped_df.to_excel('output.xlsx', index=False)
 
-    
     return HttpResponse('transfer page')
+
+def login_view(request):
+    if request.method == 'POST':        
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            # username = form.cleaned_data['username']
+            # password = form.cleaned_data['password']
+            user = form.get_user()
+            print(user)
+            # user = authenticate(username=username, password=password)
+            # print(user)
+            login(request, user)
+            return render(request, 'multistore/index.html')
+    form = AuthenticationForm()
+    return render(request, 'multistore/login.html', {'form':form})

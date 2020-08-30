@@ -1,0 +1,21 @@
+{% extends 'multistore/base.html' %}
+
+{% block title %}
+Sale
+{% endblock %}
+
+{% block body %}
+
+
+<form method="POST" action="{% url 'transact' %}">
+    {% csrf_token %}
+    {{ form }}
+    {% if form_type == 'returns' %}
+    <button type="submit" name='returns'>Submit</button>
+    {% else %}
+    <button type="submit" name='sales'>Submit</button>
+    {% endif %}
+</form>
+
+
+{% endblock %}

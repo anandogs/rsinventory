@@ -1,6 +1,7 @@
 from django.db import models
 
 
+
 class SKU(models.Model):
     sku_code = models.CharField(max_length=64)
 
