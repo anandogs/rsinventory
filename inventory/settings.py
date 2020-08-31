@@ -25,7 +25,7 @@ SECRET_KEY = 'iq(xpx5$5y%2g$b0-+3cveszbv!o_51z8ohuyv2@oz)09n(6^9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['rsinventory.herokuapp.com/', '127.0.0.1']
+ALLOWED_HOSTS = ['rsinventory.herokuapp.com', '127.0.0.1']
 
 
 # Application definition
