@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
@@ -12,10 +13,27 @@ from io import BytesIO as IO
 
 from . models import Stock, SKU, Location
 
+def check_inv(sku, inv, loc):
+    '''gets sku and location object and checks if total quantity is less than 0 and returns True if inv is positive and False if negative'''
+    sku_obj = SKU.objects.get(sku_code=sku)
+    loc_obj = Location.objects.get(location_name=loc)
+    stock_data = Stock.objects.filter(sku=sku_obj, location=loc_obj)
+    qty = 0
+    for stock in stock_data:
+        qty = qty + stock.quantity
+
+    qty = qty + inv
+    if qty > 0:
+        return True
+    return False
+
+
 def index(request):
 
+    td = datetime.today()
+    mnth = td.month
     context = {
-        'stock_details' : Stock.objects.filter().exclude(order_no='Upload')
+        'stock_details' : Stock.objects.filter(timestamp__month=mnth).exclude(order_no='Upload')
     }
     return render(request, 'multistore/index.html', context)
 
@@ -25,9 +43,18 @@ def transact(request):
         if form.is_valid():
             form.instance.user = request.user
             if 'sale' in request.POST:
-                obj = form.save(commit=False)
-                obj.quantity = -form.cleaned_data['quantity']
-                obj.save()
+                qty = -form.cleaned_data['quantity']
+                sku = form.cleaned_data['sku']
+                loc = form.cleaned_data['location']
+
+                res = check_inv(sku, qty, loc)
+                print(res)
+                if res:
+                    obj = form.save(commit=False)
+                    obj.quantity = -form.cleaned_data['quantity']
+                    obj.save()
+                else:
+                    return HttpResponse("ERROR-NEGATIVE QUANTITY TRANSACTION CANCELLED. PLEASE GO BACK AND TRY AGAIN")
             form.save()
             # return render(request, 'multistore/index.html')
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -40,7 +67,7 @@ def sale(request):
     form = TransactForm()
     context = {
         'form' : form,
-        'form_type' : 'sales'
+        'form_type' : 'sale'
     }
     
     return render(request, 'multistore/form.html', context)
@@ -57,12 +84,18 @@ def transfer(request):
             from_quantity = -to_quantity
             loc_from = form.cleaned_data['location_from']
             loc_to = form.cleaned_data['location_to']
+
+            res = check_inv(sku, from_quantity, loc_from)
+            if res:
+
             # transaction #1
-            transaction1 = Stock.objects.create(order_no='Transfer', sku=sku, quantity=to_quantity, location=loc_to, user=current_user)
-            transaction2 = Stock.objects.create(order_no='Transfer', sku=sku, quantity=from_quantity, location=loc_from, user=current_user)
-            
-            transaction1.save()
-            transaction2.save()
+                transaction1 = Stock.objects.create(order_no='Transfer', sku=sku, quantity=to_quantity, location=loc_to, user=current_user)
+                transaction2 = Stock.objects.create(order_no='Transfer', sku=sku, quantity=from_quantity, location=loc_from, user=current_user)
+                
+                transaction1.save()
+                transaction2.save()
+            else:
+                    return HttpResponse("ERROR-NEGATIVE QUANTITY TRANSACTION CANCELLED. PLEASE GO BACK AND TRY AGAIN")
 
     form = TransferForm()
     context = {

@@ -1,6 +1,6 @@
 import pandas as pd
-from . models import Stock, SKU
-# from . models import Stock, SKU, Location
+# import . models
+from . models import Stock, SKU, Location
 
 df = pd.read_csv('/Users/anandoghose/Desktop/inventory_export_1.csv', low_memory=False)
 

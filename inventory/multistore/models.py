@@ -26,4 +26,4 @@ class Stock(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
 
     def __str__(self):
-        return f'{self.timestamp}, {self.order_no}, {self.sku}, {self.quantity}, {self.location}, {self.user}'
+        return f'{self.pk}, {self.timestamp}, {self.order_no}, {self.sku}, {self.quantity}, {self.location}, {self.user}'
