@@ -9,5 +9,6 @@ urlpatterns = [
     path('returns', views.returns, name='returns'),
     path('transact', views.transact, name='transact'),
     path('download', views.download, name='download'),
-    path('login', views.login_view, name='login')
+    path('login', views.login_view, name='login'),
+    path('upload_file', views.upload_file, name='upload_file'),
 ]

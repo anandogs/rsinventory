@@ -1,21 +1,52 @@
 {% extends 'multistore/base.html' %}
 
 {% block title %}
+{% if form_type == 'returns' %}
+Returns
+{% elif form_type == 'sale' %}
 Sale
+{% else %}
+Transfer
+{% endif %}
 {% endblock %}
 
 {% block body %}
 
 
-<form method="POST" action="{% url 'transact' %}">
-    {% csrf_token %}
-    {{ form }}
-    {% if form_type == 'returns' %}
-    <button type="submit" name='returns'>Submit</button>
+
+<div class="form-container">
+
+    <h1>
+        {% if form_type == 'returns' %}
+        Returns
+        {% elif form_type == 'sale' %}
+        Sale
+        {% else %}
+        Transfer
+        {% endif %}
+    </h1>
+    
+    {% if form_type == 'transfer' %}
+    <form method="POST">
+        {% csrf_token %}
+        {{form}}
+        <button type="submit">Submit</button>
+    </form>
+
+
     {% else %}
-    <button type="submit" name='sales'>Submit</button>
+
+
+    <form method="POST" action="{% url 'transact' %}">
+        {% csrf_token %}
+        {{ form }}
+        {% if form_type == 'returns' %}
+        <button type="submit" name='returns'>Submit</button>
+        {% else %}
+        <button type="submit" name='sale'>Submit</button>
+        {% endif %}
+    </form>
+
     {% endif %}
-</form>
-
-
+</div>
 {% endblock %}

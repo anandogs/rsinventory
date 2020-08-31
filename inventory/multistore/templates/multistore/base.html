@@ -8,9 +8,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet"> 
     <title>{% block title%}{% endblock %}</title>
 </head>
-
+    <header>
+        <ul style=>
+            <li> <a href="{% url 'sale' %}">Sale</a></li>
+            <li> <a href="{% url 'transfer' %}">Transfer</a></li>
+            <li> <a href="{% url 'returns' %}">Return</a></li>
+            <li> <a href="{% url 'download' %}">Download</a></li>
+        </ul>
+    </header>
 
     {% block body %}
+    
     {% endblock %}
 
 </body>

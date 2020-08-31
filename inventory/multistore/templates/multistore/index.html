@@ -4,24 +4,43 @@
 Home
 {% endblock %}
 {% block body %}
-    <div class="entry_options">
-        <ul style="display: flex; width: 100%; justify-content: space-evenly; list-style: none;">
-            <li> <a href="{% url 'sale' %}">Sale</a></li>
-            <li> <a href="{% url 'transfer' %}">Transfer</a></li>
-            <li> <a href="{% url 'returns' %}">Return</a></li>
-            <li> <a href="{% url 'download' %}">Download</a></li>
-        </ul>
 
-        <ul>
-            {% for inventory in stock_details %}
+<table>
+    <th>Date</th>
+    <th>Order No.</th>
+    <th>SKU</th>
+    <th>Quantity</th>
+    <th>Location</th>
+    <th>User</th>
+    {% for inventory in stock_details %}
+    
+    <tr>
+        
+        <td>
+            {{ inventory.timestamp }}
             
-            <li>
-                {{ inventory }}
-            </li>
-            
-            {% endfor %}
+        </td>
+        <td>
+            {{ inventory.order_no }}
+        </td>
+        <td>
+            {{ inventory.sku }}
+        </td>
+        <td>
+            {{ inventory.quantity }}
+        </td>
+        <td>
+            {{ inventory.location }}
+        </td>
+        <td>
+            {{ inventory.user }}
+        </td>
 
-        </ul>
-    </div>
+
+    </tr>
+    {% endfor %}
+
+</table>
+
 
 {% endblock %}
