@@ -1,46 +1,28 @@
-{% extends 'multistore/base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rangsutra Landing Page</title>
+</head>
+<body>
+    <div class="entry_options">
+        <ul style="display: flex; width: 100%; justify-content: space-evenly; list-style: none;">
+            <li> <a href="{% url 'sale' %}">Sale</a></li>
+            <li> <a href="{% url 'transfer' %}">Transfer</a></li>
+            <li> <a href="{% url 'returns' %}">Return</a></li>
+            <li> <a href="{% url 'download' %}">Download</a></li>
+        </ul>
 
-{% block title %}
-Home
-{% endblock %}
-{% block body %}
-
-<table>
-    <th>Date</th>
-    <th>Order No.</th>
-    <th>SKU</th>
-    <th>Quantity</th>
-    <th>Location</th>
-    <th>User</th>
-    {% for inventory in stock_details %}
-    
-    <tr>
-        
-        <td>
-            {{ inventory.timestamp }}
+        <ul>
+            {% for inventory in stock_details %}
             
-        </td>
-        <td>
-            {{ inventory.order_no }}
-        </td>
-        <td>
-            {{ inventory.sku }}
-        </td>
-        <td>
-            {{ inventory.quantity }}
-        </td>
-        <td>
-            {{ inventory.location }}
-        </td>
-        <td>
-            {{ inventory.user }}
-        </td>
-
-
-    </tr>
-    {% endfor %}
-
-</table>
-
-
-{% endblock %}
+            <li>
+                {{ inventory }}
+            </li>
+            
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

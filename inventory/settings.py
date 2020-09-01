@@ -112,14 +112,10 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = False
-TIME_ZONE = 'Asia/Calcutta'
+USE_TZ = True
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
-# Configure Django App for Heroku.
-import django_heroku
-django_heroku.settings(locals())
