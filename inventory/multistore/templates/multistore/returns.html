@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'multistore/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet"> 
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <title>Returns</title>
+</head>
+<body>
+    
+    <div class="form-container">
+        <h1>Record a Return</h1>
+        <form action="{% url 'returns' %}" method="POST">
+            {% csrf_token %}
+            
+            <label for="order">Order Number</label>
+            <input type="text" name='order'>
+            <label for="sku">SKU</label>
+            <input type="text" id='sku' name='sku'>
+            <label for="quantity">Quantity</label>
+            <input type="number" name='quantity'>
+            <label for="Location">Location</label>
+            <select name="location" id="loc">
+                {% for location in locations%}
+                <option value="{{location}}">{{location}}</option>
+                {% endfor %}
+            </select>
+            <button>Submit</button>
+
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $( function() {
+          $( "#sku" ).autocomplete({
+            source: "{% url 'index' %}"
+          });
+        } );
+        </script>
+</body>
+</html>
