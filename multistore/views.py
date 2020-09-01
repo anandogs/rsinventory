@@ -23,7 +23,7 @@ def check_inv(sku, inv, loc):
         qty = qty + stock.quantity
 
     qty = qty + inv
-    if qty > 0:
+    if qty >= 0:
         return True
     return False
 
