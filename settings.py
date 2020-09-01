@@ -76,12 +76,8 @@ WSGI_APPLICATION = 'inventory.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pnhhlfey',
-        'USER': 'pnhhlfey',
-        'PASSWORD': 'sCKkxOQlcm448XtOCRhPscIXNJ0T0jdV',
-        'HOST': 'arjuna.db.elephantsql.com',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -116,8 +112,8 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = False
-TIME_ZONE = 'Asia/Calcutta'
+USE_TZ = True
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
