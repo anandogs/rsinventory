@@ -1,0 +1,46 @@
+{% extends 'multistore/base.html' %}
+
+{% block title %}
+Home
+{% endblock %}
+{% block body %}
+
+<table>
+    <th>Date</th>
+    <th>Order No.</th>
+    <th>SKU</th>
+    <th>Quantity</th>
+    <th>Location</th>
+    <th>User</th>
+    {% for inventory in stock_details %}
+    
+    <tr>
+        
+        <td>
+            {{ inventory.timestamp }}
+            
+        </td>
+        <td>
+            {{ inventory.order_no }}
+        </td>
+        <td>
+            {{ inventory.sku }}
+        </td>
+        <td>
+            {{ inventory.quantity }}
+        </td>
+        <td>
+            {{ inventory.location }}
+        </td>
+        <td>
+            {{ inventory.user }}
+        </td>
+
+
+    </tr>
+    {% endfor %}
+
+</table>
+
+
+{% endblock %}
