@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'inventory.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pnhhlfey',
-        'USER': 'pnhhlfey',
-        'PASSWORD': 'sCKkxOQlcm448XtOCRhPscIXNJ0T0jdV', 
-        'HOST': 'arjuna.db.elephantsql.com',
+        'NAME': 'd3ppeiqkdlmjt9',
+        'USER': 'lturjyegsdassx',
+        'PASSWORD': 'a9c8a19f0be9d908979c9ddce88cd9b742f355dde681b26e063a902bef732f25', 
+        'HOST': 'ec2-3-213-102-175.compute-1.amazonaws.com',
         'PORT': '5432',
     }
 }
@@ -123,3 +123,7 @@ TIME_ZONE = 'Asia/Calcutta'
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Configure Django App for Heroku.
+import django_heroku
+django_heroku.settings(locals())

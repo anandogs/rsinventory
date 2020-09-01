@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 class SKU(models.Model):
-    sku_code = models.CharField(max_length=64)
+    sku_code = models.CharField(max_length=128)
 
     def __str__(self):
         return f'{self.sku_code}'

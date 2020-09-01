@@ -171,9 +171,17 @@ def upload_file(request):
     user = request.user
     df = pd.read_csv('/Users/anandoghose/Desktop/inventory_export_1.csv', low_memory=False)
 
+    #create SKUs first
+
     df['SKU'].dropna(inplace=True)
     df['SKU'].drop_duplicates(inplace=True)
     
+    for i in range(len(df)):
+        sku_code = df.loc[i,'SKU']
+        print(sku_code)
+        sku_list = SKU.objects.create(sku_code=sku_code)
+        sku_list.save()
+
     location = Location.objects.filter(location_name='rs_online')[0]
 
     for i in range(len(df)):
