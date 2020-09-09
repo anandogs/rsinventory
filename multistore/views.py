@@ -40,23 +40,26 @@ def index(request):
 def transact(request):
     if request.method == 'POST':
         form = TransactForm(request.POST)
+        
         if form.is_valid():
-            form.instance.user = request.user
+            order_no =  form.cleaned_data['order_no']
+            user_sku = form.cleaned_data['sku']
+            user_loc = form.cleaned_data['location']
+            sku = SKU.objects.get(sku_code=user_sku)
+            loc = Location.objects.get(location_name=user_loc)
+            qty = form.cleaned_data['quantity']
             if 'sale' in request.POST:
-                qty = -form.cleaned_data['quantity']
-                sku = form.cleaned_data['sku']
-                loc = form.cleaned_data['location']
+                qty = -qty
+                
+            res = check_inv(sku, qty, loc)
+            print(res)
+            if res:
+                transaction = Stock.objects.create(order_no)
 
-                res = check_inv(sku, qty, loc)
-                print(res)
-                if res:
-                    obj = form.save(commit=False)
-                    obj.quantity = -form.cleaned_data['quantity']
-                    obj.save()
-                else:
-                    return HttpResponse("ERROR-NEGATIVE QUANTITY TRANSACTION CANCELLED. PLEASE GO BACK AND TRY AGAIN")
+            else:
+                return HttpResponse("ERROR-NEGATIVE QUANTITY TRANSACTION CANCELLED. PLEASE GO BACK AND TRY AGAIN")
             form.save()
-            # return render(request, 'multistore/index.html')
+                # return render(request, 'multistore/index.html')
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 

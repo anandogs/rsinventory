@@ -4,6 +4,9 @@ from . models import Stock, SKU, Location
 
 df = pd.read_csv('/Users/anandoghose/Desktop/inventory_export_1.csv', low_memory=False)
 
+
+
+
 df['SKU'].dropna(inplace=True)
 df['SKU'].drop_duplicates(inplace=True)
 
