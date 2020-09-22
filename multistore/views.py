@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponse, HttpResponseRedirect
+from django.core.exceptions import ObjectDoesNotExist
 
 from django.shortcuts import render
 from .forms import TransactForm, TransferForm
@@ -167,29 +168,45 @@ def login_view(request):
     form = AuthenticationForm()
     return render(request, 'multistore/login.html', {'form':form})
 
+
+def upload_sku(request):
+    user = request.user
+    df = pd.read_excel('/Users/anandoghose/Desktop/skus.xlsx')
+    for i in range(len(df)):
+        sku_code = df.loc[i][0]
+        print(sku_code)
+        sku_list = SKU.objects.create(sku_code=sku_code)
+        sku_list.save()
+
+    
+
 def upload_file(request):
     user = request.user
-    df = pd.read_csv('/Users/anandoghose/Desktop/inventory_export_1.csv', low_memory=False)
+    df = pd.read_excel('/Users/anandoghose/Desktop/products.xlsx')
 
     #create SKUs first
 
     df['SKU'].dropna(inplace=True)
     df['SKU'].drop_duplicates(inplace=True)
-    
-    for i in range(len(df)):
-        sku_code = df.loc[i,'SKU']
-        print(sku_code)
-        sku_list = SKU.objects.create(sku_code=sku_code)
-        sku_list.save()
+    df.fillna(0, inplace=True)
 
-    location = Location.objects.filter(location_name='rs_online')[0]
+    for col in df.columns:
+        try:
+            location = Location.objects.get(location_name=col)
+            print(col)
+            for i in range(len(df)):
+                if df.loc[i,col] == 0:
+                    pass
+                else:
+                    quantity = df.loc[i,col]
+                    sku_code = df.loc[i,'SKU']
+                    # print(sku_code)
+                    sku = SKU.objects.get(sku_code=sku_code)
+                    transaction = Stock.objects.create(order_no='Upload', sku=sku, quantity=quantity, location = location, user=user)
+                    transaction.save()
 
-    for i in range(len(df)):
-        sku_code = df.loc[i,'SKU']
-        quantity = df.loc[i,'Rangsutra Online']
-        print(sku_code)
-        sku = SKU.objects.filter(sku_code=sku_code)[0]
-        transaction = Stock.objects.create(order_no='Upload', sku=sku, quantity=quantity, location = location, user=user)
-        transaction.save()
+        except Location.DoesNotExist:
+            
+            print (f'warning the following column does not have a location allocated to it: {col}')
     
     return HttpResponse('Done')

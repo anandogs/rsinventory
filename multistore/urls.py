@@ -11,4 +11,6 @@ urlpatterns = [
     path('download', views.download, name='download'),
     path('login', views.login_view, name='login'),
     path('upload_file', views.upload_file, name='upload_file'),
+    path('upload_sku', views.upload_sku, name='upload_sku'),
+    
 ]

@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'iq(xpx5$5y%2g$b0-+3cveszbv!o_51z8ohuyv2@oz)09n(6^9'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = []
 
@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'inventory.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'd3ppeiqkdlmjt9',
-        'USER': 'lturjyegsdassx',
-        'PASSWORD': 'a9c8a19f0be9d908979c9ddce88cd9b742f355dde681b26e063a902bef732f25', 
-        'HOST': 'ec2-3-213-102-175.compute-1.amazonaws.com',
+        'NAME': 'd9rl63jkeug7cf',
+        'USER': 'nqyewkcjrtetfz',
+        'PASSWORD': 'ad8b6a31594942cd9a2b07083372de9ea0f2343a11c75873539ecb4039ece9ff', 
+        'HOST': 'ec2-54-158-222-248.compute-1.amazonaws.com',
         'PORT': '5432',
     }
 }
