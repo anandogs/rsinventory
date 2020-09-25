@@ -94,6 +94,11 @@ def transfer(request):
             loc_from = form.cleaned_data['location_from']
             loc_to = form.cleaned_data['location_to']
 
+            try:
+                sku = SKU.objects.get(sku_code=sku)
+            except ObjectDoesNotExist:
+                return HttpResponse("ERROR INCORRECT SKU. PLEASE GO BACK AND TRY AGAIN")
+
             res = check_inv(sku, from_quantity, loc_from)
             if res:
 
