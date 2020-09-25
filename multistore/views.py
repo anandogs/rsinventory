@@ -2,17 +2,30 @@ from datetime import datetime
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
-
 from django.shortcuts import render
 from .forms import TransactForm, TransferForm
 import pandas as pd
 import numpy as np
-
 from io import BytesIO as IO
 
 from . models import Stock, SKU, Location
+
+def index(request):
+    if 'term' in request.GET:
+        qs = SKU.objects.filter(sku_code__icontains=request.GET.get('term'))
+        skus = list()
+        for sku in qs:
+            skus.append(sku.sku_code)
+        return JsonResponse(skus, safe=False)
+    td = datetime.today()
+    mnth = td.month
+    context = {
+        'stock_details' : Stock.objects.filter(timestamp__month=mnth).exclude(order_no='Upload')
+    }
+    return render(request, 'multistore/index.html', context)
+
 
 def check_inv(sku, inv, loc):
     '''gets sku and location object and checks if total quantity is less than 0 and returns True if inv is positive and False if negative'''
@@ -29,46 +42,41 @@ def check_inv(sku, inv, loc):
     return False
 
 
-def index(request):
-
-    td = datetime.today()
-    mnth = td.month
-    context = {
-        'stock_details' : Stock.objects.filter(timestamp__month=mnth).exclude(order_no='Upload')
-    }
-    return render(request, 'multistore/index.html', context)
-
 def transact(request):
     if request.method == 'POST':
         form = TransactForm(request.POST)
+        
         if form.is_valid():
-            form.instance.user = request.user
+            order_no =  form.cleaned_data['order_no']
+            user_sku = form.cleaned_data['sku']
+            user_loc = form.cleaned_data['location']
+            try:
+                sku = SKU.objects.get(sku_code=user_sku)
+            except ObjectDoesNotExist:
+                return HttpResponse("ERROR INCORRECT SKU. PLEASE GO BACK AND TRY AGAIN")
+            loc = Location.objects.get(location_name=user_loc)
+            qty = form.cleaned_data['quantity']
             if 'sale' in request.POST:
-                qty = -form.cleaned_data['quantity']
-                sku = form.cleaned_data['sku']
-                loc = form.cleaned_data['location']
+                qty = -qty
+                
+            res = check_inv(sku, qty, loc)
+            print(res)
+            if res:
+                transaction = Stock.objects.create(order_no)
 
-                res = check_inv(sku, qty, loc)
-                print(res)
-                if res:
-                    obj = form.save(commit=False)
-                    obj.quantity = -form.cleaned_data['quantity']
-                    obj.save()
-                else:
-                    return HttpResponse("ERROR-NEGATIVE QUANTITY TRANSACTION CANCELLED. PLEASE GO BACK AND TRY AGAIN")
+            else:
+                return HttpResponse("ERROR-NEGATIVE QUANTITY TRANSACTION CANCELLED. PLEASE GO BACK AND TRY AGAIN")
             form.save()
-            # return render(request, 'multistore/index.html')
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
 @login_required(login_url='login')
 def sale(request):
 
-
     form = TransactForm()
     context = {
         'form' : form,
-        'form_type' : 'sale'
+        'form_type' : 'sale',
     }
     
     return render(request, 'multistore/form.html', context)
@@ -136,7 +144,6 @@ def download(request):
     
     grouped_df = df.pivot_table(values='Quantity', index='SKU', columns='Location', aggfunc=np.sum).reset_index()
     
-    # grouped_df.to_excel('output.xlsx', index=False)
     excel_file = IO()
     xlwriter = pd.ExcelWriter(excel_file, engine='xlsxwriter')
     grouped_df.to_excel(xlwriter, sheet_name='inventory', index=False)
