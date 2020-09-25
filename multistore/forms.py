@@ -3,6 +3,7 @@ from django.forms import ModelForm, TextInput
 from multistore.models import Stock, Location, SKU
 
 class TransactForm(forms.Form):
+    order_no = forms.IntegerField() 
     sku = forms.CharField()
     quantity = forms.IntegerField()
     location  = forms.ModelChoiceField(queryset=Location.objects.all())

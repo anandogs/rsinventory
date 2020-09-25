@@ -2,16 +2,30 @@ from datetime import datetime
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from django.http import HttpResponse, HttpResponseRedirect
-
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import render
 from .forms import TransactForm, TransferForm
 import pandas as pd
 import numpy as np
-
 from io import BytesIO as IO
 
 from . models import Stock, SKU, Location
+
+def index(request):
+    if 'term' in request.GET:
+        qs = SKU.objects.filter(sku_code__icontains=request.GET.get('term'))
+        skus = list()
+        for sku in qs:
+            skus.append(sku.sku_code)
+        return JsonResponse(skus, safe=False)
+    td = datetime.today()
+    mnth = td.month
+    context = {
+        'stock_details' : Stock.objects.filter(timestamp__month=mnth).exclude(order_no='Upload')
+    }
+    return render(request, 'multistore/index.html', context)
+
 
 def check_inv(sku, inv, loc):
     '''gets sku and location object and checks if total quantity is less than 0 and returns True if inv is positive and False if negative'''
@@ -28,15 +42,6 @@ def check_inv(sku, inv, loc):
     return False
 
 
-def index(request):
-
-    td = datetime.today()
-    mnth = td.month
-    context = {
-        'stock_details' : Stock.objects.filter(timestamp__month=mnth).exclude(order_no='Upload')
-    }
-    return render(request, 'multistore/index.html', context)
-
 def transact(request):
     if request.method == 'POST':
         form = TransactForm(request.POST)
@@ -45,7 +50,10 @@ def transact(request):
             order_no =  form.cleaned_data['order_no']
             user_sku = form.cleaned_data['sku']
             user_loc = form.cleaned_data['location']
-            sku = SKU.objects.get(sku_code=user_sku)
+            try:
+                sku = SKU.objects.get(sku_code=user_sku)
+            except ObjectDoesNotExist:
+                return HttpResponse("ERROR INCORRECT SKU. PLEASE GO BACK AND TRY AGAIN")
             loc = Location.objects.get(location_name=user_loc)
             qty = form.cleaned_data['quantity']
             if 'sale' in request.POST:
@@ -66,11 +74,10 @@ def transact(request):
 @login_required(login_url='login')
 def sale(request):
 
-
     form = TransactForm()
     context = {
         'form' : form,
-        'form_type' : 'sale'
+        'form_type' : 'sale',
     }
     
     return render(request, 'multistore/form.html', context)
