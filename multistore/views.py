@@ -44,6 +44,7 @@ def check_inv(sku, inv, loc):
 
 def transact(request):
     if request.method == 'POST':
+        current_user = request.user
         form = TransactForm(request.POST)
         
         if form.is_valid():
@@ -62,11 +63,11 @@ def transact(request):
             res = check_inv(sku, qty, loc)
             print(res)
             if res:
-                transaction = Stock.objects.create(order_no)
+                transaction = Stock.objects.create(order_no=order_no, sku=sku, quantity=qty, location=loc, user=current_user)
 
+                transaction.save()
             else:
                 return HttpResponse("ERROR-NEGATIVE QUANTITY TRANSACTION CANCELLED. PLEASE GO BACK AND TRY AGAIN")
-            form.save()
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 
