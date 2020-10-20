@@ -184,7 +184,8 @@ def login_view(request):
 
 def upload_sku(request):
     user = request.user
-    df = pd.read_excel('/Users/anandoghose/Desktop/skus.xlsx')
+    df = pd.read_excel('/Users/anandoghose/Desktop/products.xlsx')
+    df = df['SKU']
     for i in range(len(df)):
         sku_code = df.loc[i][0]
         print(sku_code)
