@@ -187,7 +187,7 @@ def upload_sku(request):
     df = pd.read_excel('/Users/anandoghose/Desktop/products.xlsx')
     df = df['SKU']
     for i in range(len(df)):
-        sku_code = df.loc[i][0]
+        sku_code = df.loc[i]
         print(sku_code)
         sku_list = SKU.objects.create(sku_code=sku_code)
         sku_list.save()
